@@ -5,12 +5,12 @@
 #define BACKGROUND_BLUE (Color) {91, 139, 213, 255}
 
 int main(void) {
-    const int screenWidth = 800;
+    const int screenWidth = 1250;
     const int screenHeight = 450;
 
     InitWindow(screenWidth, screenHeight, "Chasing Horizon");
     InitAudioDevice();
-    SetTargetFPS(60);
+    SetTargetFPS(120);
 
     // World Constants
     Vector2 velocity = {0.0f, 0.0f};
@@ -20,21 +20,21 @@ int main(void) {
     const Aseprite running = LoadAseprite("/Users/prasoonrai/CLionProjects/RunninSim/assets/player/run.aseprite");
     AsepriteTag running_anim = LoadAsepriteTagFromIndex(running, 0);
 
-    const Aseprite rolling = LoadAseprite("/Users/prasoonrai/CLionProjects/RunninSim/assets/player/roll.aseprite");
-    AsepriteTag rolling_anim = LoadAsepriteTagFromIndex(rolling, 0);
+    const Aseprite sliding = LoadAseprite("/Users/prasoonrai/CLionProjects/RunninSim/assets/player/slide.aseprite");
+    AsepriteTag sliding_anim = LoadAsepriteTagFromIndex(sliding, 0);
 
     const Aseprite jumping = LoadAseprite("/Users/prasoonrai/CLionProjects/RunninSim/assets/player/jump.aseprite");
     AsepriteTag jumping_anim = LoadAsepriteTagFromIndex(jumping, 0);
 
     // Player Properties
-    Vector2 playerPos = {10.0f, 250.0f};
-    float playerScale = 2.5f;
-    float playerSpeed = 500.0f;
-    float jumpForce = 900.0f;
+    Vector2 playerPos = {100.0f, 250.0f};
+    const float playerScale = 2.9f;
+    const float playerSpeed = 500.0f;
+    const float jumpForce = 900.0f;
     bool isGrounded = true;
-    bool isRolling = false;
-    float rollTimer = 0.0f;
-    const float roll_duration = 0.42f;
+    bool isSliding = false;
+    float slideTimer = 0.0f;
+    float slide_duration = 0.427f;
 
     // Mob Sprites
     const Aseprite flying_obstacle = LoadAseprite("/Users/prasoonrai/CLionProjects/RunninSim/assets/obstacles/flying.aseprite");
@@ -119,7 +119,7 @@ int main(void) {
         // DrawTextureEx(pillar, pillarPos, 0.0f, pillarScale, WHITE);
         {
             // Jumping Mechanics
-            if ((IsKeyPressed(KEY_SPACE) || IsKeyPressed(KEY_UP)) && isGrounded && !isRolling) {
+            if ((IsKeyPressed(KEY_SPACE) || IsKeyPressed(KEY_UP)) && isGrounded && !isSliding) {
                 velocity.y = -jumpForce;
                 isGrounded = false;
             }
@@ -137,29 +137,30 @@ int main(void) {
             }
 
             // Rolling Mechanics
-            if ((IsKeyPressed(KEY_S) || IsKeyPressed(KEY_DOWN)) && isGrounded && !isRolling) {
-                isRolling = true;
-                rollTimer = roll_duration;
+            if ((IsKeyPressed(KEY_S) || IsKeyPressed(KEY_DOWN)) && isGrounded && !isSliding) {
+                isSliding = true;
+                slideTimer = slide_duration;
+                sliding_anim = LoadAsepriteTagFromIndex(sliding, 0);
             }
-            if (isRolling) {
-                UpdateAsepriteTag(&rolling_anim);
-                rollTimer -= dt;
-                if (rollTimer <= 0.0f) {
-                    isRolling = false;
+            if (isSliding) {
+                UpdateAsepriteTag(&sliding_anim);
+                slideTimer -= dt;
+                if (slideTimer <= 0.0f) {
+                    isSliding = false;
                 }
             } else {
                 UpdateAsepriteTag(&running_anim);
             }
 
-            if (IsKeyDown(KEY_DOWN)) {
-
-            }
-
             BeginMode2D(camera);
+
             DrawTexturePro(pillar, sourceRecPillar, destRectPillar, pillarPos, 0.0f, WHITE);
             DrawTexturePro(floor, sourceRecFloor, destRecFloor, (Vector2){0.0f, 0.0f}, 0.0f, WHITE);
-            if (isRolling) {
-                DrawAsepriteTagExFlipped(rolling_anim, playerPos, 0.0f, playerScale, true, false, WHITE);
+
+            float slideOffsetX = (GetAsepriteWidth(sliding) - GetAsepriteWidth(running)) * playerScale;
+            if (isSliding) {
+                Vector2 slidePos = { playerPos.x - slideOffsetX, playerPos.y };
+                DrawAsepriteTagExFlipped(sliding_anim, slidePos, 0.0f, playerScale, true, false, WHITE);
             }
             else if (!isGrounded) {
                 float t = (velocity.y + jumpForce) / (2.0f * jumpForce);
@@ -182,9 +183,10 @@ int main(void) {
     UnloadTexture(cloud);
     UnloadTexture(pillar);
     UnloadMusicStream(backgroundSound);
-    UnloadAseprite(rolling);
+    UnloadAseprite(sliding);
     UnloadAseprite(jumping);
     UnloadAseprite(flying_obstacle);
+    UnloadAseprite(ground_obstacle);
     CloseWindow();
     return 0;
 }

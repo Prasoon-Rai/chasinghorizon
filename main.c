@@ -65,6 +65,7 @@ int main(void) {
     float groundScale = 1.5f;
 
     // Cloud Attributes
+    
     Vector2 cloudPos = {-40.0f, 95.0f};
     float cloudScale = 1.0f;
 
@@ -84,6 +85,10 @@ int main(void) {
     SetMusicVolume(backgroundSound, 0.5f);
     //PlayMusicStream(backgroundSound);
 
+    // Main Menu Music
+    const Music menuSound = LoadMusicStream("/Users/prasoonrai/CLionProjects/RunninSim/assets/audio/main_menu_theme.mp3");
+    SetMusicVolume(menuSound, 0.5f);
+
     while (!WindowShouldClose()) {
         float dt = GetFrameTime();
 
@@ -91,7 +96,7 @@ int main(void) {
 
         camera.target = (Vector2) { playerPos.x, 290.0 };
 
-        float floor_repeat_count = 100.0f;
+        float floor_repeat_count = 10000.0f;
         Rectangle sourceRecFloor = { 0.0f, 0.0f, floor.width * floor_repeat_count, floor.height };
         Rectangle destRecFloor = {
             groundPos.x,

@@ -4,6 +4,49 @@
 
 #define BACKGROUND_BLUE (Color) {91, 139, 213, 255}
 
+// Mob Struct
+struct FlyingMob {
+    Vector2 position;
+    Aseprite flying_obstacle;
+    AsepriteTag flying_obstacle_anime;
+    float scale;
+
+    FlyingMob(Vector2 pos, float scale): position(pos), scale(scale) {
+        flying_obstacle = LoadAseprite("/Users/prasoonrai/CLionProjects/RunninSim/assets/obstacles/flying.aseprite");
+        flying_obstacle_anime = LoadAsepriteTagFromIndex(flying_obstacle, 0);
+    }
+
+    ~FlyingMob() {
+        UnloadAseprite(flying_obstacle);
+    }
+
+    void Spawn_Flying_Mob(Vector2 position, float scale) {
+        DrawAsepriteTagExFlipped(flying_obstacle_anime, position, 0.0f, scale, true, false, WHITE);
+        UpdateAsepriteTag(&flying_obstacle_anime);
+    }
+};
+
+struct GroundMob {
+    Vector2 position;
+    Aseprite ground_obstacle;
+    AsepriteTag ground_obstacle_anime;
+    float scale;
+
+    GroundMob(Vector2 pos, float scale): position(pos), scale(scale) {
+        ground_obstacle = LoadAseprite("/Users/prasoonrai/CLionProjects/RunninSim/assets/obstacles/crystal.aseprite");
+        ground_obstacle_anime = LoadAsepriteTagFromIndex(ground_obstacle, 0);
+    }
+
+    ~GroundMob() {
+        UnloadAseprite(ground_obstacle);
+    }
+
+    void Spawn_Ground_Mob(Vector2 position, float scale) {
+        DrawAsepriteTagExFlipped(ground_obstacle_anime, position, 0.0f, scale, true, false, WHITE);
+        UpdateAsepriteTag(&ground_obstacle_anime);
+    }
+};
+
 int main(void) {
     const int screenWidth = 1250;
     const int screenHeight = 450;

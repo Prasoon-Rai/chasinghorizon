@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 3.20)
-project(RunningSim C)
+project(RunningSim C CXX)
 
-set(CMAKE_C_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include(FetchContent)
 
@@ -21,7 +22,7 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(raylib-aseprite)
 
-add_executable(RunningSim main.c)
+add_executable(RunningSim main.cpp)
 
 target_include_directories(RunningSim PRIVATE
         ${raylib-aseprite_SOURCE_DIR}/include

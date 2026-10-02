@@ -72,7 +72,7 @@ int main(void) {
     // Player Properties
     Vector2 playerPos = {100.0f, 250.0f};
     const float playerScale = 2.9f;
-    const float playerSpeed = 500.0f;
+    float playerSpeed = 655.0f;
     const float jumpForce = 900.0f;
     bool isGrounded = true;
     bool isSliding = false;
@@ -85,6 +85,11 @@ int main(void) {
 
     const Aseprite ground_obstacle = LoadAseprite("/Users/prasoonrai/CLionProjects/RunninSim/assets/obstacles/flying.aseprite");
     AsepriteTag ground_obstacle_anim = LoadAsepriteTagFromIndex(ground_obstacle, 0);
+
+    // Mob Properties
+    float flying_obstacle_scale = 2.0f;
+    float ground_obstacle_scale = 1.0f;
+    Vector2 position_flying = {2400.0f, 250.0f};
 
     // World Sprites
     const Image floor_img = LoadImage("/Users/prasoonrai/CLionProjects/RunninSim/assets/world/floor.png");
@@ -108,7 +113,6 @@ int main(void) {
     float groundScale = 1.5f;
 
     // Cloud Attributes
-    
     Vector2 cloudPos = {-40.0f, 95.0f};
     float cloudScale = 1.0f;
 
@@ -131,16 +135,18 @@ int main(void) {
     // Main Menu Music
     const Music menuSound = LoadMusicStream("/Users/prasoonrai/CLionProjects/RunninSim/assets/audio/main_menu_theme.mp3");
     SetMusicVolume(menuSound, 0.5f);
+    PlayMusicStream(menuSound);
 
     while (!WindowShouldClose()) {
         float dt = GetFrameTime();
 
         UpdateMusicStream(backgroundSound);
+        UpdateMusicStream(menuSound);
 
         camera.target = (Vector2) { playerPos.x, 290.0 };
 
         float floor_repeat_count = 10000.0f;
-        Rectangle sourceRecFloor = { 0.0f, 0.0f, floor.width * floor_repeat_count, floor.height };
+        Rectangle sourceRecFloor = { 0.0f, 0.0f, floor.width * floor_repeat_count, (float)floor.height };
         Rectangle destRecFloor = {
             groundPos.x,
             groundPos.y,
@@ -149,7 +155,7 @@ int main(void) {
         };
 
         float pillar_repeat_count = 10000.0f;
-        Rectangle sourceRecPillar = { 0.0f, 0.0f, pillar.width * pillar_repeat_count, pillar.height};
+        Rectangle sourceRecPillar = { 0.0f, 0.0f, pillar.width * pillar_repeat_count, (float)pillar.height};
         Rectangle destRectPillar = {
             pillarPos.x,
             pillarPos.y,
@@ -164,7 +170,7 @@ int main(void) {
 
         // Drawing a constant cloud
         DrawTextureEx(cloud, cloudPos, 0.0f, cloudScale, WHITE);
-        // DrawTextureEx(pillar, pillarPos, 0.0f, pillarScale, WHITE);
+
         {
             // Jumping Mechanics
             if ((IsKeyPressed(KEY_SPACE) || IsKeyPressed(KEY_UP)) && isGrounded && !isSliding) {
@@ -202,8 +208,12 @@ int main(void) {
 
             BeginMode2D(camera);
 
+            // Drawing pillar and floor
             DrawTexturePro(pillar, sourceRecPillar, destRectPillar, pillarPos, 0.0f, WHITE);
             DrawTexturePro(floor, sourceRecFloor, destRecFloor, (Vector2){0.0f, 0.0f}, 0.0f, WHITE);
+
+            // Drawing the obstacles on top of the pillar and floor
+            FlyingMob flying_one = FlyingMob(position_flying, 2.0f);
 
             float slideOffsetX = (GetAsepriteWidth(sliding) - GetAsepriteWidth(running)) * playerScale;
             if (isSliding) {
@@ -233,8 +243,6 @@ int main(void) {
     UnloadMusicStream(backgroundSound);
     UnloadAseprite(sliding);
     UnloadAseprite(jumping);
-    UnloadAseprite(flying_obstacle);
-    UnloadAseprite(ground_obstacle);
     CloseWindow();
     return 0;
 }
